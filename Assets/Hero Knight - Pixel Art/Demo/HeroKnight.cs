@@ -41,14 +41,12 @@ public class HeroKnight : MonoBehaviour
         if (!GameManager.Instance.IsGameStarted || GameManager.Instance.IsGameOver)
             return;
 
-        // Increase timers
         m_timeSinceAttack += Time.deltaTime;
         if (m_rolling)
             m_rollCurrentTime += Time.deltaTime;
         if (m_rollCurrentTime > m_rollDuration)
             m_rolling = false;
 
-        // Ground check
         if (!m_grounded && m_groundSensor.State())
         {
             m_grounded = true;
@@ -61,35 +59,28 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetBool("Grounded", m_grounded);
         }
 
-        // Selalu menghadap kanan
         GetComponent<SpriteRenderer>().flipX = false;
         m_facingDirection = 1;
 
-        // Tidak ada gerakan horizontal
         if (!m_rolling)
             m_body2d.velocity = new Vector2(0, m_body2d.velocity.y);
 
-        // Set animasi AirSpeedY
         m_animator.SetFloat("AirSpeedY", m_body2d.velocity.y);
 
-        // Wall slide (tidak terlalu penting dalam mode ini, tapi tetap diatur)
         m_isWallSliding = (m_wallSensorR1.State() && m_wallSensorR2.State()) || (m_wallSensorL1.State() && m_wallSensorL2.State());
         m_animator.SetBool("WallSlide", m_isWallSliding);
 
-        // Death
         if (Input.GetKeyDown("e") && !m_rolling)
         {
             m_animator.SetBool("noBlood", m_noBlood);
             m_animator.SetTrigger("Death");
         }
 
-        // Hurt
         else if (Input.GetKeyDown("q") && !m_rolling)
         {
             m_animator.SetTrigger("Hurt");
         }
 
-        // Attack (optional)
         else if (Input.GetMouseButtonDown(0) && m_timeSinceAttack > 0.25f && !m_rolling)
         {
             m_currentAttack++;
@@ -101,7 +92,6 @@ public class HeroKnight : MonoBehaviour
             m_timeSinceAttack = 0.0f;
         }
 
-        // Block (optional)
         else if (Input.GetMouseButtonDown(1) && !m_rolling)
         {
             m_animator.SetTrigger("Block");
@@ -112,7 +102,6 @@ public class HeroKnight : MonoBehaviour
             m_animator.SetBool("IdleBlock", false);
         }
 
-        // Roll (Slide)
         else if (Input.GetKeyDown("left shift") && !m_rolling && !m_isWallSliding)
         {
             m_rolling = true;
@@ -120,7 +109,6 @@ public class HeroKnight : MonoBehaviour
             m_body2d.velocity = new Vector2(m_facingDirection * m_rollForce, m_body2d.velocity.y);
         }
 
-        // Jump
         else if (Input.GetKeyDown("space") && m_grounded && !m_rolling)
         {
             m_animator.SetTrigger("Jump");
@@ -130,7 +118,6 @@ public class HeroKnight : MonoBehaviour
             m_groundSensor.Disable(0.2f);
         }
 
-        // Running in place
         if (!m_rolling && m_grounded)
         {
             m_delayToIdle = 0.05f;
@@ -144,7 +131,6 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    // Animation Event
     void AE_SlideDust()
     {
         Vector3 spawnPosition;
